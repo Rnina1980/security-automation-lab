@@ -1,0 +1,46 @@
+<dashboard version="1.1" theme="dark">
+  <label>Failed Login Threat Dashboard</label>
+  <description>failed_login_dashboard</description>
+  <row>
+    <panel>
+      <title>“Failed Login Attempts by User/IP”</title>
+      <chart>
+        <title>“Failed Attempts”</title>
+        <search>
+          <query>index="main" sourcetype="misc_text"
+| rex "- (?&lt;user_or_ip&gt;[A-Za-z0-9\.\:]+): (?&lt;count&gt;\d+) failed attempts"
+| stats sum(count) as total_failed_attempts by user_or_ip
+| sort - total_failed_attempts</query>
+          <earliest>-24h@h</earliest>
+          <latest>now</latest>
+        </search>
+        <option name="charting.axisLabelsX.majorLabelStyle.rotation">-45</option>
+        <option name="charting.axisTitleX.visibility">visible</option>
+        <option name="charting.axisTitleY.visibility">visible</option>
+        <option name="charting.axisTitleY2.visibility">visible</option>
+        <option name="charting.chart">column</option>
+        <option name="charting.drilldown">all</option>
+        <option name="charting.legend.placement">right</option>
+      </chart>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <title>Bar</title>
+      <chart>
+        <search>
+          <query>index="main" sourcetype="misc_text"
+| rex "- (?&lt;ip&gt;\d+\.\d+\.\d+\.\d+): (?&lt;count&gt;\d+) failed attempts"
+| stats sum(count) as total_failed_attempts by ip
+| sort - total_failed_attempts</query>
+          <earliest>0</earliest>
+          <latest></latest>
+        </search>
+        <option name="charting.axisTitleX.text">ip</option>
+        <option name="charting.axisTitleY.text">total_failed_attempts</option>
+        <option name="charting.chart">bar</option>
+        <option name="charting.drilldown">none</option>
+      </chart>
+    </panel>
+  </row>
+</dashboard>
