@@ -1,0 +1,62 @@
+<dashboard>
+    <label>High-Risk IP Dashboard</label>
+
+    <row>
+        <panel>
+            <title>Failed Login Attempts by Source IP</title>
+            <chart>
+                <search>
+                    <query>
+                        index="main" sourcetype="misc_text"
+                        | rex "- (?<indicator>[A-Za-z0-9\.\:]+): (?<count>\d+) failed attempts"
+                        | where like(indicator, "%.%.%.%")
+                        | stats sum(count) as total_failed_attempts by indicator
+                        | sort - total_failed_attempts
+                    </query>
+                </search>
+                <option name="charting.chart">column</option>
+                <option name="charting.legend.placement">right</option>
+            </chart>
+        </panel>
+    </row>
+
+    <row>
+        <panel>
+            <title>IP Threat Ranking Table</title>
+            <table>
+                <search>
+                    <query>
+                        index="main" sourcetype="misc_text"
+                        | rex "- (?<indicator>[A-Za-z0-9\.\:]+): (?<count>\d+) failed attempts"
+                        | where like(indicator, "%.%.%.%")
+                        | stats sum(count) as total_failed_attempts by indicator
+                        | sort - total_failed_attempts
+                        | rename indicator as "IP Address"
+                    </query>
+                </search>
+            </table>
+        </panel>
+    </row>
+
+    <row>
+        <panel>
+            <title>Top Offending IP</title>
+            <single>
+                <search>
+                    <query>
+                        index="main" sourcetype="misc_text"
+                        | rex "- (?<indicator>[A-Za-z0-9\.\:]+): (?<count>\d+) failed attempts"
+                        | where like(indicator, "%.%.%.%")
+                        | stats sum(count) as total_failed_attempts by indicator
+                        | sort - total_failed_attempts
+                        | head 1
+                        | fields indicator
+                    </query>
+                </search>
+                <option name="afterLabel"> (Most Failed Logins)</option>
+                <option name="colorMode">indicator</option>
+            </single>
+        </panel>
+    </row>
+
+</dashboard>
